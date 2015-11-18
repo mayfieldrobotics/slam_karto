@@ -17,13 +17,28 @@ find_package(catkin REQUIRED
 find_package(Eigen REQUIRED)
 
 include_directories(${catkin_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS})
+
 add_definitions(${EIGEN_DEFINITIONS})
 
-catkin_package()
+catkin_package(
+        DEPENDS Eigen
+        INCLUDE_DIRS src
+        LIBRARIES spa_solver
+)
 
 add_executable(slam_karto src/slam_karto.cpp src/spa_solver.cpp)
 target_link_libraries(slam_karto ${catkin_LIBRARIES})
 
-install(TARGETS slam_karto
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+add_library(spa_solver src/spa_solver.cpp)
+target_link_libraries(spa_solver ${catkin_LIBRARIES})
+
+install(TARGETS slam_karto spa_solver
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY src/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
 )
